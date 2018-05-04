@@ -1,0 +1,19 @@
+{
+  "name": "drive",
+  "version": "1.0.0",
+  "main": "quickstart.js",
+  "scripts": {
+    "start": "node app"
+  },
+  "author": "lulu",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.0",
+    "express": "^4.16.3",
+    "googleapis": "^27.0.0",
+    "mongoose": "^5.0.17",
+    "pug": "^2.0.3"
+  },
+  "devDependencies": {},
+  "description": ""
+}
