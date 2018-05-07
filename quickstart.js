@@ -6,17 +6,14 @@ const app = express();
 const mongoose = require('mongoose');
 const hostname = '127.0.0.1'
 const port = 3000;
+const bodyParser = require('body-parser');
 // const readline = require('readline');
 // const {google} = require('googleapis');
 // const OAuth2Client = google.auth.OAuth2;
 // const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
 // const TOKEN_PATH = 'credentials.json';
-
-mongoose.connect('mongodb://localhost', {
-  db: 'drive',
-  user: 'admin',
-  pass: 'admin123'
-});
+// mongoose.connect('mongodb://driverUserAdmin:password@localhost:27017/drive');
+mongoose.connect('mongodb://localhost/drive');
 let db = mongoose.connection;
 
 //check connection
@@ -28,20 +25,26 @@ db.once('open', function(){
 db.on('error', function(err){
   console.log(err);
 });
+
 //Bring in models
-// mongoose.connection.on('open', function(){
-//         for (var i in mongoose.connection.collections) {
-//             console.log(mongoose.connection.collections[i]);
-//         }
-// });
 let Detail = require('./models/details');
 
 //Load view engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
+//Set Public folder
+app.use(express.static(path.join(__dirname, 'public')));
+
 //Home route
 app.get('/', function(req, res){
-  Detail.findOne({},[], function(err, details){
+  Detail.find({},function(err, details){
     if(err){
       console.log(err);
     } else{
@@ -50,6 +53,31 @@ app.get('/', function(req, res){
         title: 'Drive Details',
         details: details
       });
+    }
+  });
+});
+
+//add route
+app.get('/id/add', function(req, res){
+  res.render('enter_id', {
+    title: 'Enter ID'
+  });
+});
+
+// Add submit POST
+app.post('/id/add', function(req, res){
+  let detail = new Detail();
+  detail.name = req.body.name;
+  detail.id = req.body.id;
+  detail.owner = req.body.owner;
+  detail.body = req.body.body;
+
+  detail.save(function(err){
+    if(err){
+      console.log(err);
+      return;
+    } else {
+      res.redirect('/')
     }
   });
 });
