@@ -2,11 +2,11 @@ let mongoose = require('mongoose');
 
 //Users Schema
 let detailSchema = mongoose.Schema({
-  Name:{
+  name:{
     type: String,
     required: true
   },
-  Owner:{
+  owner:{
     type: String,
     required: true
   },

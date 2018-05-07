@@ -29,16 +29,19 @@ db.on('error', function(err){
   console.log(err);
 });
 //Bring in models
-
+// mongoose.connection.on('open', function(){
+//         for (var i in mongoose.connection.collections) {
+//             console.log(mongoose.connection.collections[i]);
+//         }
+// });
 let Detail = require('./models/details');
 
 //Load view engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
-
 //Home route
 app.get('/', function(req, res){
-  Detail.find({}, [],function(err, details){
+  Detail.findOne({},[], function(err, details){
     if(err){
       console.log(err);
     } else{
