@@ -48,7 +48,6 @@ app.get('/', function(req, res){
     if(err){
       console.log(err);
     } else{
-      console.log(details);
       res.render('index', {
         title: 'Drive Details',
         details: details
@@ -57,10 +56,20 @@ app.get('/', function(req, res){
   });
 });
 
+//Get single folder details
+app.get('/details/:id', function(req, res){
+  Detail.findById(req.params.id, function(err, details){
+    console.log(details)
+    res.render('detail', {
+      details:details
+    });
+  })
+})
+
 //add route
 app.get('/id/add', function(req, res){
   res.render('enter_id', {
-    title: 'Enter ID'
+    title: 'New Folder'
   });
 });
 
@@ -68,7 +77,6 @@ app.get('/id/add', function(req, res){
 app.post('/id/add', function(req, res){
   let detail = new Detail();
   detail.name = req.body.name;
-  detail.id = req.body.id;
   detail.owner = req.body.owner;
   detail.body = req.body.body;
 
@@ -81,6 +89,48 @@ app.post('/id/add', function(req, res){
     }
   });
 });
+
+//Edit folder
+app.get('/detail/edit/:id', function(req, res){
+  Detail.findById(req.params.id, function(err, details){
+    res.render('edit_details', {
+      title: 'Edit folder',
+      details:details
+    });
+  });
+});
+
+// Update submit POST
+app.post('/details/edit/:id', function(req, res){
+  let detail= {};
+  detail.name = req.body.name;
+  detail.owner = req.body.owner;
+  detail.body = req.body.body;
+
+  let query = {_id:req.params.id} // query for ensuring the id in the request is the folder being updated
+  Detail.update(query, detail, function(err){
+    if(err){
+      console.log(err);
+      return;
+    } else {
+      res.redirect('/')
+    }
+  });
+});
+
+//Delete Folder
+app.delete('/detail/:id', function(req, res){
+  let query = {_id:req.params.id}
+
+  Detail.remove(query, function(err){
+    if(err){
+      console.log(err)
+    } //test for the error
+    res.send('Success'); //sends back response because request was made in main.js
+  });
+});
+
+
 // start server
 app.listen(3000, function(){
   console.log('Server started on port 3000...')

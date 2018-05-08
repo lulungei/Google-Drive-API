@@ -3,20 +3,17 @@ extends layout
 block content
   h1 #{title}
   form(method= 'POST', action='/id/add')
-    #form-group
-      label ID
-      input.form-control(name='id', type='text')
     
     #form-group
       label Name
       input.form-control(name='name', type='text')
     
-        
     #form-group
       label Owner
       input.form-control(name='owner', type='text')
         
     #form-group
       label Body 
-      input.form-control(name='body', type='text')
-      input.btn.btn-primary(type='Submit', value='submit')
+      textarea.form-control(name='body', type='text')
+    br  
+    input.btn.btn-primary(type='Submit', value='submit')

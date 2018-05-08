@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1= details.name
+  h5 Folder ID: #{details._id} 
+  h5 Owned by: #{details.owner} 
+  p #{details.body}
+  hr
+  a.btn.btn-default(href='/detail/edit/'+details._id) Edit
+  a.btn.btn-danger.delete-detail(href='#', data-id=details._id) Delete

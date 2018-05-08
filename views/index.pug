@@ -4,4 +4,5 @@ block content
     h1 #{title}
     ul.list-group
       each detail, i in details
-        li.list-group-item= detail.name
+        li.list-group-item
+          a(href="/details/"+detail._id)= detail.name
