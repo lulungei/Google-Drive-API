@@ -4,7 +4,7 @@ $(document).ready(function(){
     const id =($target.attr('data-id'));
     $.ajax({
       type:'DELETE',
-      url: '/detail/'+id,
+      url: '/details/'+id,
       success: function(response){
         alert('Deleting Folder');
         window.location.href='/';

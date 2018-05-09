@@ -7,6 +7,9 @@ const mongoose = require('mongoose');
 const hostname = '127.0.0.1'
 const port = 3000;
 const bodyParser = require('body-parser');
+const expressValidator = require('express-validator');
+const flash = require('connect-flash');
+const session = require('express-session');
 // const readline = require('readline');
 // const {google} = require('googleapis');
 // const OAuth2Client = google.auth.OAuth2;
@@ -42,6 +45,37 @@ app.use(bodyParser.json())
 //Set Public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Express session middleware
+app.use(session({
+  secret: 'keyboard cat',
+  resave: true,
+  saveUninitialized: true
+}))
+
+//Express messages middleware
+app.use(require('connect-flash')());
+app.use(function (req, res, next) {
+  res.locals.messages = require('express-messages')(req, res);
+  next();
+});
+
+//Express Validator middleware
+app.use(expressValidator({
+  errorFormatter: function(param, msg, value){
+    var namespace = param.split('.')
+    , root   = namespace.shift()
+    , formParam = root;
+
+  while(namespace.length) {
+    formParam += '[' + namespace.shift() +']';
+  }
+  return {
+    param : formParam,
+    msg   : msg,
+    value : value
+  };
+  }
+}));
 //Home route
 app.get('/', function(req, res){
   Detail.find({},function(err, details){
@@ -56,80 +90,12 @@ app.get('/', function(req, res){
   });
 });
 
-//Get single folder details
-app.get('/details/:id', function(req, res){
-  Detail.findById(req.params.id, function(err, details){
-    console.log(details)
-    res.render('detail', {
-      details:details
-    });
-  })
-})
+// route Files
 
-//add route
-app.get('/id/add', function(req, res){
-  res.render('enter_id', {
-    title: 'New Folder'
-  });
-});
-
-// Add submit POST
-app.post('/id/add', function(req, res){
-  let detail = new Detail();
-  detail.name = req.body.name;
-  detail.owner = req.body.owner;
-  detail.body = req.body.body;
-
-  detail.save(function(err){
-    if(err){
-      console.log(err);
-      return;
-    } else {
-      res.redirect('/')
-    }
-  });
-});
-
-//Edit folder
-app.get('/detail/edit/:id', function(req, res){
-  Detail.findById(req.params.id, function(err, details){
-    res.render('edit_details', {
-      title: 'Edit folder',
-      details:details
-    });
-  });
-});
-
-// Update submit POST
-app.post('/details/edit/:id', function(req, res){
-  let detail= {};
-  detail.name = req.body.name;
-  detail.owner = req.body.owner;
-  detail.body = req.body.body;
-
-  let query = {_id:req.params.id} // query for ensuring the id in the request is the folder being updated
-  Detail.update(query, detail, function(err){
-    if(err){
-      console.log(err);
-      return;
-    } else {
-      res.redirect('/')
-    }
-  });
-});
-
-//Delete Folder
-app.delete('/detail/:id', function(req, res){
-  let query = {_id:req.params.id}
-
-  Detail.remove(query, function(err){
-    if(err){
-      console.log(err)
-    } //test for the error
-    res.send('Success'); //sends back response because request was made in main.js
-  });
-});
-
+let details = require('./routes/details');
+let users = require('./routes/users');
+app.use('/details', details);
+app.use('/users', users);
 
 // start server
 app.listen(3000, function(){

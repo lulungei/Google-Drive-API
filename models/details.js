@@ -1,6 +1,6 @@
 let mongoose = require('mongoose');
 
-//Users Schema
+//Details Schema
 let detailSchema = mongoose.Schema({
   name:{
     type: String,
