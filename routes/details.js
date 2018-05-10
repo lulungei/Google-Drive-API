@@ -209,7 +209,7 @@ function getAccessToken(oAuth2Client, callback) {
         includeRemoved: false,
         spaces: 'drive',
         fileId: fileId,
-        fields: 'nextPageToken, files(id, name, parents, mimeType, modifiedTime, owners, viewedByMeTime, starred)',
+        fields: 'nextPageToken, files(id, webViewLink, name, parents, mimeType, modifiedTime, owners, viewedByMeTime, starred)',
         q: `'${fileId}' in parents`
     },(err, {data}) => {
         if (err) return console.log('The API returned an error: ' + err);
@@ -218,7 +218,7 @@ function getAccessToken(oAuth2Client, callback) {
           console.log('Files:');
           files.map((file) => {
             const content=JSON.stringify(files, null, 2);// this is where you convert the details object to a valid JSON string
-            fs.writeFileSync('response.json',content);//this is where the file details are written to a file
+            fs.writeFileSync('${file.id}.json',content);//this is where the file details are written to a file
 
             console.log(`${file.name} (${file.id}) ${file.mimeType} ${file.modifiedTime} ${file.parents} ${file.viewedByMeTime} ${file.starred}`);
           });
