@@ -21,7 +21,7 @@ router.get('/add', ensureAuthenticated, function(req, res){
 });
 
 // Add submit POST route
-router.post('/add', function(req, res){
+router.post('/add', ensureAuthenticated, getGoogleAuth, function(req, res){
   req.checkBody('name', 'Name is required').notEmpty();
   //req.checkBody('owner', 'Owner is required').notEmpty();
   req.checkBody('body', 'Body is required').notEmpty();
@@ -38,18 +38,29 @@ router.post('/add', function(req, res){
     let detail = new Detail();
     detail.name = req.body.name;
     detail.owner = req.user._id;
-    detail.body = req.body.body;
-
-    detail.save(function(err){
-      if(err){
-        console.log(err);
-        return;
-      } else {
-        req.flash('success', 'Folder Added');
-        res.redirect('/')
-      }
-    });
-
+    detail.folderId = req.body.body;
+    const drive = google.drive({version: 'v3', auth:req.googleAuth});
+    drive.files.list({
+          includeRemoved: false,
+          spaces: 'drive',
+          fileId: detail.folderId,
+          fields: 'nextPageToken, files(id, webViewLink, name, parents, mimeType, modifiedTime, owners, viewedByMeTime, starred)',
+          q: `'${detail.folderId}' in parents`
+      },(err, response) => {
+          if (err) return console.log('The API returned an error: ' + err);
+          const data = response.data;
+          const files = data.files;
+          detail.files=files;
+          detail.save(function(err){
+            if(err){
+              console.log(err);
+              return;
+            } else {
+              req.flash('success', 'Folder Added');
+              res.redirect('/')
+            }
+          });
+        });
   }
 
 
@@ -68,6 +79,17 @@ router.get('/edit/:id', ensureAuthenticated, function(req, res){
     });
   });
 });
+router.get('/:id', function(req, res){
+  Detail.findById(req.params.id, function(err, details){
+    User.findById(details.owner, function(err, user){
+      res.render('detail', {
+        details:details,
+        owner: user.name
+      });
+    });
+  })
+})
+
 
 // Update submit POST
 router.post('/edit/:id', function(req, res){
@@ -131,12 +153,23 @@ function ensureAuthenticated(req, res, next){
     res.redirect('/users/login');
   }
 }
+//This function fetches the authentication token and adds it to the request
+function getGoogleAuth(req, res, next){
+  fs.readFile('client_secret.json', (err, content) => {
+    if (err) return console.log('Error loading client secret file:', err);
+    // Authorize a client with credentials, then call the Google Drive API.
+    authorize(JSON.parse(content), (auth)=>{
+      req.googleAuth=auth;
+      next();
+    });
+  });
+}
 
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Drive API.
-  authorize(JSON.parse(content), listFiles);
+  authorize(JSON.parse(content), ()=>{});
 });
 
 /**
@@ -194,42 +227,42 @@ function getAccessToken(oAuth2Client, callback) {
  */
  //Get single folder details
 
-    function listFiles(auth) {
-      router.get('/:id', function(req, res){
-        Detail.findById(req.params.id, function(err, details){
-          User.findById(details.owner, function(err, user){
-            res.render('detail', {
-              details:details,
-              owner: user.name
-            });
-      const drive = google.drive({version: 'v3', auth});
-      // console.console.log();
-      var fileId = details.body;
-    drive.files.list({
-        includeRemoved: false,
-        spaces: 'drive',
-        fileId: fileId,
-        fields: 'nextPageToken, files(id, webViewLink, name, parents, mimeType, modifiedTime, owners, viewedByMeTime, starred)',
-        q: `'${fileId}' in parents`
-    },(err, {data}) => {
-        if (err) return console.log('The API returned an error: ' + err);
-        const files = data.files;
-        if (files.length) {
-          console.log('Files:');
-          files.map((file) => {
-            const content=JSON.stringify(files, null, 2);// this is where you convert the details object to a valid JSON string
-            fs.writeFileSync('${file.id}.json',content);//this is where the file details are written to a file
+  //   function listFiles(auth) {
+  //     router.get('/:id', function(req, res){
+  //       Detail.findById(req.params.id, function(err, details){
+  //         User.findById(details.owner, function(err, user){
+  //           res.render('detail', {
+  //             details:details,
+  //             owner: user.name
+  //           });
+  //     const drive = google.drive({version: 'v3', auth});
+  //     // console.console.log();
+  //     var fileId = details.body;
+  //   drive.files.list({
+  //       includeRemoved: false,
+  //       spaces: 'drive',
+  //       fileId: fileId,
+  //       fields: 'nextPageToken, files(id, webViewLink, name, parents, mimeType, modifiedTime, owners, viewedByMeTime, starred)',
+  //       q: `'${fileId}' in parents`
+  //   },(err, {data}) => {
+  //       if (err) return console.log('The API returned an error: ' + err);
+  //       const files = data.files;
+  //       if (files.length) {
+  //         console.log('Files:');
+  //         files.map((file) => {
+  //           const content=JSON.stringify(files, null, 2);// this is where you convert the details object to a valid JSON string
+  //           fs.writeFileSync('${file.id}.json',content);//this is where the file details are written to a file
 
-            console.log(`${file.name} (${file.id}) ${file.mimeType} ${file.modifiedTime} ${file.parents} ${file.viewedByMeTime} ${file.starred}`);
-          });
-        } else {
-          console.log('No files found.');
-        }
-      });
-    });
-  });
-  });
-    }
+  //           console.log(`${file.name} (${file.id}) ${file.mimeType} ${file.modifiedTime} ${file.parents} ${file.viewedByMeTime} ${file.starred}`);
+  //         });
+  //       } else {
+  //         console.log('No files found.');
+  //       }
+  //     });
+  //   });
+  // });
+  // });
+  //   }
 
 
 module.exports = router;

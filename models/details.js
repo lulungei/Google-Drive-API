@@ -10,9 +10,13 @@ let detailSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  body:{
+  folderId:{
     type: String,
     required: true
+  },
+  files:{
+    type: Array,
+    default: []
   }
 
 });
