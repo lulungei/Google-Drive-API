@@ -3,7 +3,7 @@ extends layout
 block content
   h1= details.name
   h5 Folder ID: #{details._id} 
-  h5 Owned by: #{details.owner} 
+  h5 Owned by: #{owner} 
   p #{details.body}
   hr
   a.btn.btn-default(href='/details/edit/'+details._id) Edit

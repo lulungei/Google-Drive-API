@@ -10,13 +10,15 @@ const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
 const flash = require('connect-flash');
 const session = require('express-session');
+const passport = require('passport');
+const config = require('./config/database');
 // const readline = require('readline');
 // const {google} = require('googleapis');
 // const OAuth2Client = google.auth.OAuth2;
 // const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
 // const TOKEN_PATH = 'credentials.json';
 // mongoose.connect('mongodb://driverUserAdmin:password@localhost:27017/drive');
-mongoose.connect('mongodb://localhost/drive');
+mongoose.connect(config.database);
 let db = mongoose.connection;
 
 //check connection
@@ -76,6 +78,20 @@ app.use(expressValidator({
   };
   }
 }));
+
+//Passport Congig
+require('./config/passport')(passport);
+
+//Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('*', function(req, res, next){
+  res.locals.user = req.user || null;
+  next();
+
+})
+
 //Home route
 app.get('/', function(req, res){
   Detail.find({},function(err, details){
@@ -101,7 +117,7 @@ app.use('/users', users);
 app.listen(3000, function(){
   console.log('Server started on port 3000...')
 })
-//
+
 // // Load client secrets from a local file.
 // fs.readFile('client_secret.json', (err, content) => {
 //   if (err) return console.log('Error loading client secret file:', err);
