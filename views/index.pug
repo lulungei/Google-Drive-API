@@ -12,7 +12,7 @@ block content
         h3 Getting Started
         div
           pfont(size='6px') Create access to files and folders in your google drive folder without having other people login to your drive.
-            img(src='/images/download.jpeg', width="300" height="300", align="right")
+            img(src='/images/download.jpeg', width="300" height="300", align="center")
           ul
             li Copy folder id from your google drive url https://drive.google.com/drive/u/0/folders/id.
             li Paste the id in the body field in the add folder form.
@@ -29,15 +29,15 @@ block content
         each detail, i in details
           tr
             td
-              a(href="/details/"+details._id)= detail.name
+              a.btn.btn-info(href="/details/"+detail._id)= detail.name
             td
               span #{detail._id}
             td
-              h6 #{user.name}
+              h6 #{detail.owner.name}
             td
-              a.btn.btn-success(href='/details/edit/'+details._id) Edit
+              a.btn.btn-success(href='/details/edit/'+detail._id) Edit
             td
-              a.btn.btn-danger.delete-detail(href='#', data-id=details._id) Delete
+              a.btn.btn-danger.delete-detail(href='#', data-id=detail._id) Delete
                 
                   
             

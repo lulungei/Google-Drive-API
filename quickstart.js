@@ -94,7 +94,7 @@ app.get('*', function(req, res, next){
 
 //Home route
 app.get('/', function(req, res){
-  Detail.find({},function(err, details){
+  Detail.find({}).populate('owner').exec(function(err, details){
     if(err){
       console.log(err);
     } else{
