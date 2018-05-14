@@ -2,8 +2,11 @@ doctype html
 html
   head
     title Drive Details
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', href='https://www.w3schools.com/w3css/4/w3.css')
     link(rel= 'stylesheet' href='/bower_components/bootstrap/dist/css/bootstrap.css')
     link(rel= 'stylesheet' href='/css/style.css')
+    script(src='/js/script.js')
   body
     nav.navbar.navbar-expand-md.navbar-dark.bg-dark
       a.navbar-brand(href='#') Drive Folder Details
@@ -30,11 +33,6 @@ html
               a.nav-link(href='/users/register') Register
             li.nav-item
               a.nav-link(href='/users/login') Login
-              
-          
-        form.form-inline.my-2.my-lg-0
-          input.form-control.mr-sm-2(type='text', placeholder='Search', aria-label='Search')
-          button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Search 
 
     .container
       != messages('message', local)
@@ -44,6 +42,7 @@ html
       block content  
       br
       hr
+    .w3-container.w3-teal
       footer
         p Copyright &copy; 2018
       script(src='/bower_components/jquery/dist/jquery.js')

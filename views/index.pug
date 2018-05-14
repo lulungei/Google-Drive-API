@@ -1,8 +1,44 @@
 extends layout
 
 block content
-    h1 #{title}
-    ul.list-group
-      each detail, i in details
-        li.list-group-item
-          a(href="/details/"+detail._id)= detail.name
+  meta(name='viewport', content='width=device-width, initial-scale=1')
+  link(rel='stylesheet', href='https://www.w3schools.com/w3css/4/w3.css')
+  
+  h1 #{title}
+  br
+  .w3-container
+    body
+      if !user
+        h3 Getting Started
+        div
+          pfont(size='6px') Create access to files and folders in your google drive folder without having other people login to your drive.
+            img(src='/images/download.jpeg', width="300" height="300", align="right")
+          ul
+            li Copy folder id from your google drive url https://drive.google.com/drive/u/0/folders/id.
+            li Paste the id in the body field in the add folder form.
+            hr
+    if user 
+      table
+        tr
+          th Folder name
+          th Folder id
+          th Owned by
+          th Edit 
+          th Delete
+         
+        each detail, i in details
+          tr
+            td
+              a(href="/details/"+detail._id)= detail.name
+            td
+              span #{detail._id}
+            td
+              h6 #{user.name}
+            td
+              a.btn.btn-success(href='/details/edit/'+details._id) Edit
+            td
+              a.btn.btn-danger.delete-detail(href='#', data-id=details._id) Delete
+                
+                  
+            
+        

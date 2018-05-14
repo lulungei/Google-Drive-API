@@ -2,13 +2,24 @@ extends layout
 
 block content
 	h1= details.name
-	h5 Folder ID: #{details._id} 
-	h5 Owned by: #{owner} 
-	each detail, i in details.files
-		p
-			span #{detail.name}
-			br
-			a(href=detail.webViewLink)= detail.webViewLink
+	h6 Folder ID: #{details._id} 
+	h6 Owned by: #{owner} 
+	table
+		tr
+			th File name
+			th Alternate link
+			th Copy
+			
+			 
+		each detail, i in details.files
+			tr
+				td
+					span #{detail.name}
+				td
+					a(id="link"+i, href=detail.webViewLink)= detail.webViewLink
+				td
+					button.btn.default(onclick="copy('link" + i + "')") Copy
+					
 	hr
-	a.btn.btn-default(href='/details/edit/'+details._id) Edit
+	a.btn.btn-success(href='/details/edit/'+details._id) Edit
 	a.btn.btn-danger.delete-detail(href='#', data-id=details._id) Delete
